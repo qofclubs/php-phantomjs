@@ -1,5 +1,5 @@
 {
-    "name": "horror/php-phantomjs",
+    "name": "mattimatti/php-phantomjs",
     "description": "A PHP wrapper for loading pages through PhantomJS",
     "keywords": ["PhantomJS", "Testing", "Headless Browser"],
 	"type": "library",
@@ -14,10 +14,10 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=7.1.3",
-        "symfony/config": "~4.0",
-        "symfony/dependency-injection": "~4.0",
-        "symfony/filesystem": "~4.0",
-        "symfony/yaml": "~4.0",
+        "symfony/config": "^5.0",
+        "symfony/dependency-injection": "^5.0",
+        "symfony/filesystem": "^5.0",
+        "symfony/yaml": "^5.0",
         "twig/twig": "*",
         "jakoch/phantomjs-installer": "^3"
     },
