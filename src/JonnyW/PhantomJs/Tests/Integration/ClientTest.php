@@ -109,7 +109,7 @@ EOF;
      */
     public function testSyntaxExceptionIsThrownIfRequestProcedureContainsSyntaxError()
     {
-        $this->setExpectedException('\JonnyW\PhantomJs\Exception\SyntaxException');
+        $this->expectException('\JonnyW\PhantomJs\Exception\SyntaxException');
 
         $content = 'TEST_PROCEDURE';
 
@@ -190,7 +190,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains('PHANTOMJS_DEFAULT_TEST', $response->getContent());
+        $this->assertStringContainsString('PHANTOMJS_DEFAULT_TEST', $response->getContent());
     }
 
     /**
@@ -209,7 +209,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains('userAgent=PhantomJS TEST', $response->getContent());
+        $this->assertStringContainsString('userAgent=PhantomJS TEST', $response->getContent());
     }
 
     /**
@@ -228,7 +228,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains('cookie_test_cookie=TESTING_COOKIES', $response->getContent());
+        $this->assertStringContainsString('cookie_test_cookie=TESTING_COOKIES', $response->getContent());
     }
 
     /**
@@ -254,7 +254,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains('test_cookie=TESTING_COOKIES; HttpOnly; expires=Mon, 16-Nov-2020 00:00:00 GMT; domain=.jonnyw.kiwi; path=/)', file_get_contents($file));
+        $this->assertStringContainsString('test_cookie=TESTING_COOKIES; HttpOnly; expires=Mon, 16-Nov-2020 00:00:00 GMT; domain=.jonnyw.kiwi; path=/)', file_get_contents($file));
     }
 
     /**
@@ -287,7 +287,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertNotContains('test_cookie=TESTING_COOKIES; HttpOnly; expires=Mon, 16-Nov-2020 00:00:00 GMT; domain=.jonnyw.kiwi; path=/)', file_get_contents($file));
+        $this->assertStringNotContainsString('test_cookie=TESTING_COOKIES; HttpOnly; expires=Mon, 16-Nov-2020 00:00:00 GMT; domain=.jonnyw.kiwi; path=/)', file_get_contents($file));
     }
 
     /**
@@ -321,8 +321,8 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertNotContains('test_cookie_1=TESTING_COOKIES_1; HttpOnly; expires=Mon, 16-Nov-2020 00:00:00 GMT; domain=.jonnyw.kiwi; path=/)', file_get_contents($file));
-        $this->assertNotContains('test_cookie_2=TESTING_COOKIES_2; HttpOnly; expires=Mon, 16-Nov-2020 00:00:00 GMT; domain=.jonnyw.kiwi; path=/)', file_get_contents($file));
+        $this->assertStringNotContainsString('test_cookie_1=TESTING_COOKIES_1; HttpOnly; expires=Mon, 16-Nov-2020 00:00:00 GMT; domain=.jonnyw.kiwi; path=/)', file_get_contents($file));
+        $this->assertStringNotContainsString('test_cookie_2=TESTING_COOKIES_2; HttpOnly; expires=Mon, 16-Nov-2020 00:00:00 GMT; domain=.jonnyw.kiwi; path=/)', file_get_contents($file));
     }
 
     /**
@@ -376,7 +376,7 @@ EOF;
         $console = $response->getConsole();
 
         $this->assertCount(1, $console);
-        $this->assertContains('ReferenceError: Can\'t find variable: invalid', $console[0]['message']);
+        $this->assertStringContainsString('ReferenceError: Can\'t find variable: invalid', $console[0]['message']);
     }
 
     /**
@@ -456,8 +456,8 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains(sprintf('<li>test1=%s</li>', 'http://test.com'), $response->getContent());
-        $this->assertContains(sprintf('<li>test2=%s</li>', 'A string with an \' ) / # some other invalid [ characters.'), $response->getContent());
+        $this->assertStringContainsString(sprintf('<li>test1=%s</li>', 'http://test.com'), $response->getContent());
+        $this->assertStringContainsString(sprintf('<li>test2=%s</li>', 'A string with an \' ) / # some other invalid [ characters.'), $response->getContent());
     }
 
     /**
@@ -561,10 +561,12 @@ EOF;
 
         $client->send($request, $response);
 
-        $pdf = \ZendPdf\PdfDocument::load($file);
+        $parser = new \Smalot\PdfParser\Parser();
+        $pdf = $parser->parseFile($file);
+        $details = $pdf->getPages()[0]->getDetails();
 
-        $pdfWidth = round(($pdf->pages[0]->getWidth() * 0.0352777778));
-        $pdfHeight = round(($pdf->pages[0]->getHeight() * 0.0352777778));
+        $pdfWidth = round($details['MediaBox'][2] * 0.0352777778);
+        $pdfHeight = round($details['MediaBox'][3] * 0.0352777778);
 
         $this->assertEquals($width, $pdfWidth);
         $this->assertEquals($height, $pdfHeight);
@@ -592,10 +594,12 @@ EOF;
 
         $client->send($request, $response);
 
-        $pdf = \ZendPdf\PdfDocument::load($file);
+        $parser = new \Smalot\PdfParser\Parser();
+        $pdf = $parser->parseFile($file);
+        $details = $pdf->getPages()[0]->getDetails();
 
-        $pdfWidth = round(($pdf->pages[0]->getWidth() * 0.0352777778));
-        $pdfHeight = round(($pdf->pages[0]->getHeight() * 0.0352777778));
+        $pdfWidth = round($details['MediaBox'][2] * 0.0352777778);
+        $pdfHeight = round($details['MediaBox'][3] * 0.0352777778);
 
         $this->assertEquals(21, $pdfWidth);
         $this->assertEquals(30, $pdfHeight);
@@ -624,10 +628,12 @@ EOF;
 
         $client->send($request, $response);
 
-        $pdf = \ZendPdf\PdfDocument::load($file);
+        $parser = new \Smalot\PdfParser\Parser();
+        $pdf = $parser->parseFile($file);
+        $details = $pdf->getPages()[0]->getDetails();
 
-        $pdfWidth = round(($pdf->pages[0]->getWidth() * 0.0352777778));
-        $pdfHeight = round(($pdf->pages[0]->getHeight() * 0.0352777778));
+        $pdfWidth = round($details['MediaBox'][2] * 0.0352777778);
+        $pdfHeight = round($details['MediaBox'][3] * 0.0352777778);
 
         $this->assertEquals(30, $pdfWidth);
         $this->assertEquals(21, $pdfHeight);
@@ -663,7 +669,7 @@ EOF;
 
         $text = str_replace(' ', '', $pdf->getText());
 
-        $this->assertContains('Header', $text);
+        $this->assertStringContainsString('Header', $text);
     }
 
     /**
@@ -696,7 +702,7 @@ EOF;
 
         $text = str_replace(' ', '', $pdf->getText());
 
-        $this->assertContains('Footer', $text);
+        $this->assertStringContainsString('Footer', $text);
     }
 
     /**
@@ -937,7 +943,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains('<p id="content">loaded</p>', $response->getContent());
+        $this->assertStringContainsString('<p id="content">loaded</p>', $response->getContent());
     }
 
     /**
@@ -959,7 +965,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains('<p id="content"></p>', $response->getContent());
+        $this->assertStringContainsString('<p id="content"></p>', $response->getContent());
     }
 
     /**
@@ -979,7 +985,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains('[DEBUG]', $client->getLog());
+        $this->assertStringContainsString('[DEBUG]', $client->getLog());
     }
 
     /**
@@ -1003,7 +1009,7 @@ EOF;
 
         $client->send($request, $response);
 
-        $this->assertContains('body style="background-color: red;"', $response->getContent());
+        $this->assertStringContainsString('body style="background-color: red;"', $response->getContent());
     }
 
     /** +++++++++++++++++++++++++++++++++++ **/
@@ -1036,7 +1042,7 @@ EOF;
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->filename = 'test.proc';
         $this->directory = sys_get_temp_dir();
@@ -1049,7 +1055,7 @@ EOF;
     /**
      * Tear down test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $filename = $this->getFilename();
 
